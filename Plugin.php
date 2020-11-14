@@ -1,30 +1,28 @@
 <?php
 /**
- * 一款专属于Handsome的信息提示插件
- * @package HandsomeCall
- * @author Wibus
- * @version 3.0
- * @link https://blog.iucky.cn
+ * 一款信息提示插件
+ * @package ThemeNotice
+ * @author Hui2007
+ * @version 1.0
+ * @link https://blog.hui2007.ml
  */
  
 
 
-class HandsomeCall_Plugin implements Typecho_Plugin_Interface
+class ThemeNotice implements Typecho_Plugin_Interface
 {
 	public static function activate()
 	{
         Typecho_Plugin::factory('Widget_Archive')->footer = array(__CLASS__, 'footer');
-        return _t('插件已启用，请访问前台查看效果～');
+        return _t('插件已启用，请访问前台查看效果');
     }
 
 	/* 禁用插件方法 */
 	public static function deactivate()
 	{
-        return _t('插件已禁用，感谢使用～');
+        return _t('插件已禁用，感谢使用');
 	}
-
-
-     /**
+         /**
      * 获取插件配置面板
      *
      * @access public
@@ -33,91 +31,46 @@ class HandsomeCall_Plugin implements Typecho_Plugin_Interface
      */
     public static function config(Typecho_Widget_Helper_Form $form)
     {
-    
-    
-    
-    
-        // 插件信息与更新检测
-        function check_update($version)
-        {
 
-            echo "<style>.info{text-align:center; margin:20px 0;} .info > *{margin:0 0 15px} .buttons a{background:#467b96; color:#fff; border-radius:4px; padding: 8px 10px; display:inline-block;}.buttons a+a{margin-left:10px}</style>";
-            echo "<div id='tip'></div>";
-            echo "<div class='info'>";
-            echo "<h2>一款专属于Handsome的信息提示插件 (" . $version . ")</h2>";
-
-            echo "<h3>最新版本：<span style='padding: 2px 4px; background-image: linear-gradient(90deg, rgba(73, 200, 149, 1), rgba(38, 198, 218, 1)); background-position: initial; background-size: initial; background-repeat: initial; background-attachment: initial; background-origin: initial; background-clip: initial; color: rgba(255, 255, 255, 1); border-width: 0.25em 0' id='ver'>获取中...</span>&nbsp;&nbsp;当前版本：<span id='now'>".$version. "</span></h3>";
-            echo "<h3 style='color: rgba(255, 153, 0, 1)' id='description'></h3>";
-            echo "<p>By: <a href='https://blog.iucky.cn'>Wibus</a></p>";
-            echo "<p><span class='buttons'><a href='https://blog.iucky.cn/Y-disk/10.html'>插件说明</a></span>
-            <span id='btn' class='buttons'><a id='description'>获取更新说明</a></span></p>";
-            echo "<script src='https://api.iucky.cn/plugins/update/handsomecall.js'></script>";
-            echo "</div>";
-
-        }
-        check_update("3.0");
-        
-        
-        // 是否启动复制功能
-        $copy = new Typecho_Widget_Helper_Form_Element_Radio(
-            'copy',
+        // 是否引入jQuery
+        $jquery = new Typecho_Widget_Helper_Form_Element_Radio(
+            'jquery',
             array(
                 '0' => _t('否'),
                 '1' => _t('是'),
             ),
             '1',
-            _t('是否启动复制提示功能'),
-            _t('使用handsome自带的提示弹窗实现复制提醒，如果启动了Pjax，请将下面的选项勾选为 是')
+            _t('是否引入了jQuery'),
+            _t('部分主题/插件可能已引入，多次引入可能会减慢网站加载速度')
         );
-        $form->addInput($copy);
+        $form->addInput($jquery);
         
-        // 是否启动Pjax
-        $pjax = new Typecho_Widget_Helper_Form_Element_Radio(
-            'pjax',
+        // 是否引入Bootstrap
+        $bootstrap = new Typecho_Widget_Helper_Form_Element_Radio(
+            'bootstrap',
             array(
                 '0' => _t('否'),
                 '1' => _t('是'),
             ),
             '1',
-            _t('主题是否启动了Pjax'),
-            _t('如果主题启动了Pjax，插件将会自动在Pjax回调函数里添加 kaygb_copy(); 函数')
+            _t('是否引入了Bootstrap'),
+            _t('部分主题/插件可能已引入，多次引入可能会减慢网站加载速度')
         );
-        $form->addInput($pjax);
-        
-        // 作者信息
-        $author = new Typecho_Widget_Helper_Form_Element_Text(
-            'author',
-            NULL,
-            'https://api.btstu.cn/sjbz/?lx=dongman',
-            _t('作者名字：'),
-            _t('复制操作时将会显示信息，没启动复制功能的直接忽略')
+        $form->addInput($bootstrap);
+
+        // 是否引入Popper.js
+        $popper = new Typecho_Widget_Helper_Form_Element_Radio(
+            'popper',
+            array(
+                '0' => _t('否'),
+                '1' => _t('是'),
+            ),
+            '1',
+            _t('是否引入了Popper.js'),
+            _t('部分主题/插件可能已引入，多次引入可能会减慢网站加载速度')
         );
-        $form->addInput($author);
-        
-        
-        
+        $form->addInput($popper);
     }
-    /**
-     * 个人用户的配置面板
-     *
-     * @access public
-     * @param Typecho_Widget_Helper_Form $form
-     * @return void
-     */
-    public static function personalConfig(Typecho_Widget_Helper_Form $form)
-    {
-
-    }
-
-	/* 插件实现方法 */
-    /**
-     * file for header
-     * @return void
-     */
-    public static function header(){
-        
-    }
-    
     /**
      * 页脚输出相关代码
      *
@@ -131,73 +84,67 @@ class HandsomeCall_Plugin implements Typecho_Plugin_Interface
         $refererhost = parse_url($referer);
         $host = strtolower($refererhost['host']);
         $ben=$_SERVER['HTTP_HOST'];
-		$options = Helper::options();
-		$author = $options->plugin('HandsomeCall')->author;
-		$copy = $options->plugin('HandsomeCall')->copy;
-		$pjax = $options->plugin('HandsomeCall')->pjax;
-        //$type = Typecho_Widget::widget('Widget_Options')->plugin('HandsomeCall')->author;
-        if($copy == 1){
-        echo '<script>
-            kaygb_copy();
-function kaygb_copy(){$(document).ready(function(){$("body").bind(\'copy\',function(e){hellolayer()})});var sitesurl=window.location.href;function hellolayer(){
-    $.message({
-        message: "尊重原创，转载请注明出处！<br> 本文作者：' . $author . '<br>原文链接："+sitesurl,
-        title: "复制成功",
-        type: "warning",
-        autoHide: !1,
-        time: "5000"
-        })
-    }}
-    </script>';
-    if ($pjax == 1){
-    echo '<script>$(document).on("ready pjax:end", function () { kaygb_copy(); })</script>';
-    //echo "<script>console.log('HandsomeCall Pjax-Load SUCCESS ')</script>";
-    }
-}
-
-        $hello = "Hello！<strong>".$host."</strong>的朋友！你好哇";
+	    $options = Helper::options();
+		$jquery = $options->plugin('ThemeNotice')->jquery;
+		$bootstrap = $options->plugin('ThemeNotice')->bootstrap;
+        if ($jquery == 0){
+            echo '<script src="https://cdn.staticfile.org/jquery/3.5.1/jquery.min.js" type="text/javascript"></script>';
+        }
+        if ($bootstrap == 0){
+            echo '<script src="https://cdn.staticfile.org/twitter-bootstrap/4.2.1/js/bootstrap.min.js"></script>
+            <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.2.1/css/bootstrap.css">';
+        }
+        if ($popper == 0){
+            echo '<script src="https://cdn.staticfile.org/popper.js/1.14.7/popper.min.js"></script>';
+        }
+        $hello = "欢迎来自<strong>".$host."</strong>的朋友！你好哇！";
         if($referer == ""||$referer == null){
             if(!Typecho_Cookie::get('firstView')){
                 Typecho_Cookie::set('firstView', '1', 0, Helper::options()->siteUrl);
-                $hello = "欢迎来到小站里喝茶~  我倍感荣幸啊 嘿嘿 <br / > ";
+                $hello = "欢迎来到小站里喝茶~ 我倍感荣幸啊，嘿嘿<br / > ";
             }else{
-                $hello = "欢迎来到小站里喝茶~! 您竟然是直接访问的！莫非您记住了我的<strong>域名</strong>.厉害~ <br / > ";
+                $hello = "欢迎来到小站里喝茶！<br / > ";
             }
         }elseif(strstr($ben,$host)){ 
             $hello ="host"; 
         }elseif (preg_match('/baiducontent.*/i', $host)){
-            $hello = '您通过 <strong>百度快照</strong> 找到了我，厉害！<br / > ';
+            $hello = '欢迎通过<strong>百度快照</strong>访问的朋友！<br / > ';
         }elseif(preg_match('/baidu.*/i', $host)){
-            $hello = '您通过 <strong>百度</strong> 找到了我，厉害！<br / > ';
+            $hello = '欢迎来自<strong>百度</strong>的朋友！<br / > ';
         }elseif(preg_match('/so.*/i', $host)){
-            $hello = '您通过 <strong>好搜</strong> 找到了我，厉害！<br / > ';
+            $hello = '欢迎来自<strong>好搜</strong>的朋友！<br / > ';
         }elseif(!preg_match('/www\.google\.com\/reader/i', $referer) && preg_match('/google\./i', $referer)) {
-            $hello = '您居然通过 <strong>Google</strong> 找到了我! 一定是个技术宅吧!<br / > ';
+            $hello = '欢迎来自<strong>Google</strong>的朋友！<br / > ';
         }elseif(preg_match('/search\.yahoo.*/i', $referer) || preg_match('/yahoo.cn/i', $referer)){
-            $hello = '您通过 <strong>Yahoo</strong> 找到了我! 厉害！<br / > '; 
+            $hello = '欢迎来自<strong>Yahoo</strong>的朋友！<br / > '; 
         }elseif(preg_match('/cn\.bing\.com\.*/i', $referer) || preg_match('/yahoo.cn/i', $referer)){
-            $hello = '您通过 <strong>Bing</strong> 找到了我! 厉害！<br / > ';
+            $hello = '欢迎来自<strong>Bing</strong>的朋友！<br / > ';
         }elseif(preg_match('/google\.com\/reader/i', $referer)){
-            $hello = "感谢你通过 <strong>Google</strong> 订阅我!  既然过来读原文了. 欢迎留言指导啊.嘿嘿 ^_^<br / > ";
+            $hello = "感谢通过<strong>Google</strong>订阅我的朋友！欢迎！<br / > ";
         } elseif (preg_match('/xianguo\.com\/reader/i', $referer)) {
-            $hello = "感谢你通过 <strong>鲜果</strong> 订阅我!  既然过来读原文了. 欢迎留言指导啊.嘿嘿 ^_^<br / > ";
+            $hello = "感谢通过<strong>鲜果</strong>订阅我的朋友！欢迎！<br / > ";
         } elseif (preg_match('/zhuaxia\.com/i', $referer)) {
-            $hello = "感谢你通过 <strong>抓虾</strong> 订阅我!  既然过来读原文了. 欢迎留言指导啊.嘿嘿 ^_^<br / > ";
+            $hello = "感谢通过<strong>抓虾</strong>订阅我的朋友！欢迎！<br / > ";
         } elseif (preg_match('/inezha\.com/i', $referer)) {
-            $hello = "感谢你通过 <strong>哪吒</strong> 订阅我!  既然过来读原文了. 欢迎留言指导啊.嘿嘿 ^_^<br / > ";
+            $hello = "感谢通过<strong>哪吒</strong>订阅我的朋友！欢迎！<br / > ";
         } elseif (preg_match('/reader\.youdao/i', $referer)) {
-            $hello = "感谢你通过 <strong>有道</strong> 订阅我!  既然过来读原文了. 欢迎留言指导啊.嘿嘿 ^_^<br / > ";
+            $hello = "感谢通过<strong>有道</strong>订阅我的朋友！欢迎！<br / > ";
         }
+        $jsUrl = Helper::options()->pluginUrl . '/ThemeNotice/dist/toast.min.js';
+        $cssUrl = Helper::options()->pluginUrl . '/ThemeNotice/dist/toast.min.css';
         if( $hello != "host"){//排除本地访问
 	        echo "
+<script src='{$jsUrl}'></script>
+<link rel=\"stylesheet\" href=\"{$cssUrl}\">
 <script type=\"text/javascript\">
     function notice(){
-		$.message({
-    	    title: '页面加载完毕',
-    	    message: '{$hello}',
-			type: 'success',
-			autoHide: !1,
-			time: '5000'
+		$.toast({
+	      title: '页面加载完毕',
+          subtitle: '',
+          content: '{$hello}',
+          type: 'success',
+          pause_on_hover: 'true',
+          delay: 5000
     	});
 	};
 	$(function(){
